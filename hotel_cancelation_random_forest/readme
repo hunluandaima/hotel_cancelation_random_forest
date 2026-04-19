@@ -1,0 +1,2 @@
+The files required to make this project work are /templates/index.html, /app.py, /model_columns (1).joblib, and hotel_cancelation_random_forest (1).ipynb.
+Because the model(hotel_cancelation_random_forest (1).ipynb) exceeds the file size limit of github, it needs to be generated through the ipynb file.
