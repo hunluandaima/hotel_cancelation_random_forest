@@ -4,8 +4,6 @@ import joblib
 
 app = Flask(__name__)
 
-# 1. Load the model and the CORRECT expected columns when the app starts
-# (Ensure 'random_forest_model.joblib' and 'model_columns (1).joblib' are in the same folder)
 model = joblib.load('random_forest_model.joblib')
 model_columns = joblib.load('model_columns (1).joblib') # <--- UPDATED FILENAME
 
@@ -15,8 +13,7 @@ def home():
     
     if request.method == 'POST':
         try:
-            # 2. Grab ALL 30 features from the HTML form and set the correct data types
-            # These are the base features BEFORE get_dummies is applied
+           
             input_dict = {
                 'hotel': request.form.get('hotel', ''),
                 'lead_time': int(request.form.get('lead_time', 0)),
@@ -50,19 +47,12 @@ def home():
                 'reservation_status_date': request.form.get('reservation_status_date', '')
             }
             
-            # 3. Convert user input into a Pandas DataFrame
+
             input_df = pd.DataFrame([input_dict])
             
-            # 4. Apply get_dummies to the user input
-            # This creates columns like 'hotel_Resort Hotel' or 'country_PRT' based ONLY on what the user typed
             input_dummies = pd.get_dummies(input_df)
-            
-            # 5. THE MAGIC FIX: Reindex to align exactly with your training data
-            # This looks at 'model_columns (1).joblib', adds all the hundreds of missing columns 
-            # (like 'country_USA', 'meal_BB', etc.), and sets them to 0 so the model doesn't crash.
             input_aligned = input_dummies.reindex(columns=model_columns, fill_value=0)
-            
-            # 6. Make the prediction
+
             pred_value = model.predict(input_aligned)[0]
             prediction = "Likely to Cancel 🚨" if pred_value == 1 else "Likely to Keep Booking ✅"
             
