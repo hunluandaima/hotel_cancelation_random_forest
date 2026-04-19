@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Cancellation Predictor</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #2c3e50;
+        }
+        .result-box {
+            background-color: #e8f8f5;
+            border-left: 5px solid #1abc9c;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+            text-align: center;
+            border-radius: 4px;
+        }
+        .form-section {
+            margin-bottom: 25px;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 6px;
+        }
+        .form-section h3 {
+            margin-top: 0;
+            color: #34495e;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 5px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            font-size: 0.9em;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>🏨 Hotel Cancellation Predictor</h2>
+
+    {% if prediction %}
+        <div class="result-box">
+            <strong>Result:</strong> {{ prediction }}
+        </div>
+    {% endif %}
+
+    <form method="POST">
+        
+        <div class="form-section">
+            <h3>Hotel & Timing</h3>
+            <div class="grid">
+                <div class="form-group">
+                    <label>Hotel Type</label>
+                    <select name="hotel">
+                        <option value="Resort Hotel">Resort Hotel</option>
+                        <option value="City Hotel">City Hotel</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Lead Time (Days)</label>
+                    <input type="number" name="lead_time" value="30">
+                </div>
+                <div class="form-group">
+                    <label>Arrival Year</label>
+                    <input type="number" name="arrival_date_year" value="2017">
+                </div>
+                <div class="form-group">
+                    <label>Arrival Month</label>
+                    <select name="arrival_date_month">
+                        <option value="August">August</option>
+                        <option value="July">July</option>
+                        <option value="January">January</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Arrival Week Number</label>
+                    <input type="number" name="arrival_date_week_number" value="33">
+                </div>
+                <div class="form-group">
+                    <label>Arrival Day of Month</label>
+                    <input type="number" name="arrival_date_day_of_month" value="15">
+                </div>
+                <div class="form-group">
+                    <label>Weekend Nights Stay</label>
+                    <input type="number" name="stays_in_weekend_nights" value="2">
+                </div>
+                <div class="form-group">
+                    <label>Week Nights Stay</label>
+                    <input type="number" name="stays_in_week_nights" value="5">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>Guests</h3>
+            <div class="grid">
+                <div class="form-group">
+                    <label>Adults</label>
+                    <input type="number" name="adults" value="2">
+                </div>
+                <div class="form-group">
+                    <label>Children</label>
+                    <input type="number" step="1" name="children" value="0">
+                </div>
+                <div class="form-group">
+                    <label>Babies</label>
+                    <input type="number" name="babies" value="0">
+                </div>
+                <div class="form-group">
+                    <label>Meal Plan</label>
+                    <select name="meal">
+                        <option value="BB">Bed & Breakfast (BB)</option>
+                        <option value="HB">Half Board (HB)</option>
+                        <option value="FB">Full Board (FB)</option>
+                        <option value="SC">Self Catering (SC)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Country (3 Letters)</label>
+                    <input type="text" name="country" value="PRT">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>Booking Specifications</h3>
+            <div class="grid">
+                <div class="form-group">
+                    <label>Market Segment</label>
+                    <input type="text" name="market_segment" value="Online TA">
+                </div>
+                <div class="form-group">
+                    <label>Distribution Channel</label>
+                    <input type="text" name="distribution_channel" value="TA/TO">
+                </div>
+                <div class="form-group">
+                    <label>Reserved Room Type</label>
+                    <input type="text" name="reserved_room_type" value="A">
+                </div>
+                <div class="form-group">
+                    <label>Assigned Room Type</label>
+                    <input type="text" name="assigned_room_type" value="A">
+                </div>
+                <div class="form-group">
+                    <label>Deposit Type</label>
+                    <select name="deposit_type">
+                        <option value="No Deposit">No Deposit</option>
+                        <option value="Non Refund">Non Refundable</option>
+                        <option value="Refundable">Refundable</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Customer Type</label>
+                    <select name="customer_type">
+                        <option value="Transient">Transient</option>
+                        <option value="Contract">Contract</option>
+                        <option value="Group">Group</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>History & Financials</h3>
+            <div class="grid">
+                <div class="form-group">
+                    <label>Repeated Guest? (1=Yes, 0=No)</label>
+                    <input type="number" name="is_repeated_guest" value="0" min="0" max="1">
+                </div>
+                <div class="form-group">
+                    <label>Previous Cancellations</label>
+                    <input type="number" name="previous_cancellations" value="0">
+                </div>
+                <div class="form-group">
+                    <label>Prev. Bookings Kept</label>
+                    <input type="number" name="previous_bookings_not_canceled" value="0">
+                </div>
+                <div class="form-group">
+                    <label>Booking Changes</label>
+                    <input type="number" name="booking_changes" value="0">
+                </div>
+                <div class="form-group">
+                    <label>Agent ID</label>
+                    <input type="number" name="agent" value="9">
+                </div>
+                <div class="form-group">
+                    <label>Company ID</label>
+                    <input type="number" name="company" value="0">
+                </div>
+                <div class="form-group">
+                    <label>Days on Waiting List</label>
+                    <input type="number" name="days_in_waiting_list" value="0">
+                </div>
+                <div class="form-group">
+                    <label>Average Daily Rate (ADR)</label>
+                    <input type="number" step="0.01" name="adr" value="100.00">
+                </div>
+                <div class="form-group">
+                    <label>Req. Parking Spaces</label>
+                    <input type="number" name="required_car_parking_spaces" value="0">
+                </div>
+                <div class="form-group">
+                    <label>Total Special Requests</label>
+                    <input type="number" name="total_of_special_requests" value="1">
+                </div>
+                <div class="form-group">
+                    <label>Status Date (YYYY-MM-DD)</label>
+                    <input type="text" name="reservation_status_date" value="2017-08-15">
+                </div>
+            </div>
+        </div>
+
+        <button type="submit">Run Model Prediction</button>
+    </form>
+</div>
+
+</body>
+</html>
